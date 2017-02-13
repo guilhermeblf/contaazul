@@ -1,0 +1,169 @@
+<!doctype html>
+<html ng-app="guilhermeFront">
+<head>
+	<title>Lista de carros com AngularJS</title>
+	<meta charset="utf-8">
+	<link rel="apple-touch-icon" sizes="57x57" href="img/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="img/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="img/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="img/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="img/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="img/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="img/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="img/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="img/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="img/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+	<link rel="manifest" href="img/manifest.json">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="img/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/bootstrap-grid.min.css">
+	<link rel="stylesheet" href="css/toastr.css">
+	<link rel="stylesheet" href="css/application.css">
+</head>
+<body>
+	<header>
+		<div class="container">
+			<div class="header-bg">
+				<div class="logo offset-md-1">
+					<img src="img/conta-azul-logo.png" alt="Conta Azul">
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<section ng-controller="ListaCarrosController">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-7 offset-md-1">
+					<button class="btn btn-success" ng-disabled="edit && deleteItens" ng-click="openForm()">
+						Novo Carro
+					</button>
+				</div>
+
+				<div class="col-md-3">
+					<div class="input-group">
+						<input type="search" class="form-control" ng-model="search" placeholder="Pesquisar">
+						<span class="input-group-addon"></span>
+					</div>
+				</div>
+
+				<div class="col-md-10 offset-md-1">
+					<form class="row" name="formCarro" ng-show="form">
+						<div class="form-group col-md-4">
+							<label for="placa">Placa<span>*</span></label>
+							<input type="text" ui-mask="AAA 9999" id="placa" class="form-control" ng-model="item.placa" required>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="marca">Marca<span>*</span></label>
+							<input type="text" id="marca" class="form-control" ng-model="item.marca" required>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="modelo">Modelo<span>*</span></label>
+							<input type="text" id="modelo" class="form-control" ng-model="item.modelo" required>
+						</div>
+						<div class="form-group col-md-4">
+							<label for="valor">Valor</label>
+							<input type="text" id="valor" class="form-control" ng-model="item.valor">
+						</div>
+
+						<div class="form-group  col-md-4">
+							<label for="valor">Combustível</label>
+							<select name="" class="form-control" ng-model="item.combustivel">
+								<option ng-selected="true" value="Gasolina">Selecione</option>
+								<option value="Gasolina">Gasolina</option>
+								<option value="Álcool">Álcool</option>
+								<option value="Flex">Flex</option>
+							</select>
+						</div>
+
+						<div class="form-group  col-md-4">
+							<label for="placa">Url da Imagem</label>
+							<input type="text" id="imagem" class="form-control" ng-model="item.imagem">
+						</div>
+
+						<div class="form-group col-md-12 text-right">
+
+							<button ng-hide="edit && delete" class="btn btn-success" ng-disabled="formCarro.$invalid" ng-click="createCar()">
+								Adicionar Carro
+							</button>
+
+							<button ng-show="edit" class="btn btn-success" ng-disabled="formCarro.$invalid" ng-click="applyChanges()">
+								<i class="icon-ok icon-white"></i> salvar
+							</button>	
+
+						</div>
+					</form>
+
+				</div>
+				<div class="col-md-10 offset-md-1">
+					<div class="border">
+						<table id="lista-compras" class="table text-xs-left">
+							<thead>
+								<tr>
+									<th>
+										<label class="custom-control custom-checkbox top-label">
+											<input type="checkbox" class="custom-control-input" ng-model="selectedAll" ng-click="checkAll()">
+											<span class="custom-control-indicator"></span>
+										</label>
+									</th>
+									<th>Placa</th>
+									<th>Modelo</th>
+									<th>Marca</th>
+									<th>Foto</th>
+									<th>Combustível</th>
+									<th class="valor">Valor</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr dir-paginate="item in items | filter: search | itemsPerPage: 5" ng-class="item.checked ? 'select-true' : 'select-false'">
+									<td> 
+										<label class="custom-control custom-checkbox">
+											<input type="checkbox" ng-change="changeCheckbox($index)" class="custom-control-input" ng-model="item.checked">
+											<span class="custom-control-indicator"></span>
+										</label>
+									</td>
+									<td>{{ item.placa }}</td>
+									<td>{{ item.modelo }}</td>
+									<td>{{ item.marca }}</td>
+									<td>
+										<span ng-show="!item.imagem">Sem Imagem</span>
+										<span ng-show="item.imagem"><a href="{{ item.imagem}}">Imagem</a></span>
+									</td>
+									<td>{{ item.combustivel }}</td>
+									<td  class="valor">{{ item.valor | currency : '' : fractionSize}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="text-center">
+							<dir-pagination-controls boundary-links="true" on-page-change="pageChangeHandler(newPageNumber)" template-url="lib/dirPagination.tpl.html"></dir-pagination-controls>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-10 offset-md-1">
+					<button ng-show="edit" class="btn" ng-click="editItem()">
+						Editar
+					</button>
+
+					<button ng-show="delete" class="btn btn-danger" ng-click="deleteItens()">
+						Deletar
+					</button>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="lib/jquery.min.js"></script>
+	<script src="lib/angular.min.js"></script>
+	<script src="lib/angular-locate_pt-br.js"></script>
+	<script src="lib/toastr.min.js"></script>
+	<script src="app/controllers.js"></script>
+	<script src="lib/pagination.js"></script>
+	<script src="lib/mask.js"></script>
+</body>
+</html>
